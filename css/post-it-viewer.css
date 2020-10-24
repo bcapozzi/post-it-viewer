@@ -1,0 +1,15 @@
+.postIt {
+  float: left;
+  height: 300px;
+  width: 300px;
+  vertical-align: middle;
+  font-size: 12px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
+  font-family: cursive;
+  box-shadow: 20px 20px 50px grey;
+}

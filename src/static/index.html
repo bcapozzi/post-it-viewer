@@ -1,0 +1,45 @@
+<!-- Code based on https://www.paramander.com/blog/using-ports-to-deal-with-files-in-elm-0-17 -->
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Post-It Viewer</title>
+    <link rel="shortcut icon" type="image/png" href=""/>
+    <link rel="stylesheet" href="../../css/post-it-viewer.css"/>
+    <script src="../../PVMain.js" type="text/javascript"></script>
+  </head>
+  <body>
+    <div class="cf" id="main">
+    </div>
+    <script>
+
+    var app = Elm.PVMain.init({node: document.getElementById("main")});
+
+    app.ports.fileSelected.subscribe(function (id) {
+
+      var node = document.getElementById(id);
+      if (node === null) {
+        return;
+      }
+
+      var file = node.files[0];
+      var reader = new FileReader();
+
+      // FileReader API is event based. Once a file is selected
+      // it fires events. We hook into the `onload` event for our reader.
+      reader.onload = (function(event) {
+        var fileString = event.target.result;
+
+        var portData = {
+          contents: fileString,
+          filename: file.name
+        };
+
+        app.ports.fileContentRead.send(portData);
+      });
+
+      // Connect our FileReader with the file that was selected in our `input` node.
+      reader.readAsText(file);
+    });
+  </script>
+  </body>
+</html>
