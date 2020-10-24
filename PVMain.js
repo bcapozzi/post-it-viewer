@@ -5851,7 +5851,7 @@ var $author$project$PVMain$csvView = F2(
 			return $elm$html$Html$text('NOTHING TO SHOW');
 		}
 	});
-var $elm$html$Html$h2 = _VirtualDom_node('h2');
+var $elm$html$Html$h1 = _VirtualDom_node('h1');
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
@@ -5885,6 +5885,7 @@ var $author$project$PVMain$getColor = function (index) {
 			return '#333333';
 	}
 };
+var $elm$html$Html$h2 = _VirtualDom_node('h2');
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $author$project$PVMain$renderPostIt = function (pair) {
@@ -5946,11 +5947,11 @@ var $author$project$PVMain$view = function (model) {
 		_List_fromArray(
 			[
 				A2(
-				$elm$html$Html$h2,
+				$elm$html$Html$h1,
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text('STUFF')
+						$elm$html$Html$text('Post It Generator')
 					])),
 				A2(
 				$elm$html$Html$div,

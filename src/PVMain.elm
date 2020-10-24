@@ -137,7 +137,7 @@ extractFields pairs noteSoFar =
 view : Model -> Html Msg
 view model =
     div []
-        [ h2 [] [ text "STUFF" ]
+        [ h1 [] [ text "Post It Generator" ]
         , div [ class "FileWrapper" ]
             [ input
                 [ type_ "file"
