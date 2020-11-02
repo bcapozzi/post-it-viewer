@@ -9,6 +9,8 @@ import Json.Decode as JD
 import Ports exposing (CSVPortData, fileContentRead, fileSelected)
 import Random
 import Set exposing (..)
+import Svg exposing (..)
+import Svg.Attributes exposing (..)
 
 
 main =
@@ -137,11 +139,11 @@ extractFields pairs noteSoFar =
 view : Model -> Html Msg
 view model =
     div []
-        [ h1 [] [ text "Post It Generator" ]
-        , div [ class "FileWrapper" ]
+        [ h1 [] [ Html.text "Post It Generator" ]
+        , div [ Html.Attributes.class "FileWrapper" ]
             [ input
-                [ type_ "file"
-                , id "CSVInput"
+                [ Html.Attributes.type_ "file"
+                , Html.Attributes.id "CSVInput"
                 , on "change"
                     (JD.succeed CSVSelected)
                 ]
@@ -149,7 +151,7 @@ view model =
             ]
         , csvView model.csvFile model.csvData
         , br [] []
-        , button [ onClick RenderNotes ] [ text "Render Post-Its" ]
+        , button [ onClick RenderNotes ] [ Html.text "Render Post-Its" ]
         , renderPostIts model.notes model.colorIndices
         ]
 
@@ -170,10 +172,10 @@ renderPostIt pair =
         colorIndex =
             Tuple.second pair
     in
-    div [ class "postIt", style "background-color" (getColor colorIndex) ]
-        [ h2 [] [ text ("TO: " ++ note.recipient) ]
-        , h2 [] [ text ("FROM: " ++ note.author) ]
-        , h2 [] [ text note.message ]
+    div [ Html.Attributes.class "postIt", Html.Attributes.style "background-color" (getColor colorIndex) ]
+        [ h2 [] [ Html.text ("TO: " ++ note.recipient) ]
+        , h2 [] [ Html.text ("FROM: " ++ note.author) ]
+        , h2 [] [ Html.text note.message ]
         ]
 
 
@@ -203,7 +205,7 @@ csvView file csvData =
             csvTable csvData
 
         Nothing ->
-            "NOTHING TO SHOW" |> text
+            "NOTHING TO SHOW" |> Html.text
 
 
 csvTable : Csv -> Html Msg
@@ -211,7 +213,7 @@ csvTable data =
     div []
         [ table []
             (tr []
-                (List.map (\h -> th [] [ text h ]) data.headers)
-                :: List.map (\r -> tr [] (List.map (\c -> td [] [ text c ]) r)) data.records
+                (List.map (\h -> th [] [ Html.text h ]) data.headers)
+                :: List.map (\r -> tr [] (List.map (\c -> td [] [ Html.text c ]) r)) data.records
             )
         ]
