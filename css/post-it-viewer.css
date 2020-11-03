@@ -14,3 +14,7 @@
   font-family: "Permanent Marker";
   box-shadow: 20px 20px 50px grey;
 }
+
+.pshadow {
+  filter:drop-shadow(8px 8px 10px gray);
+}

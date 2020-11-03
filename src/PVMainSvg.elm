@@ -1,4 +1,4 @@
-module PVMain exposing (..)
+module PVMainSvg exposing (..)
 
 import Browser exposing (..)
 import Csv exposing (..)

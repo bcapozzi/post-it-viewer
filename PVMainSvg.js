@@ -5231,16 +5231,16 @@ var $lovasoa$elm_csv$Csv$Csv = F2(
 	function (headers, records) {
 		return {headers: headers, records: records};
 	});
-var $author$project$PVMain$Model = F4(
+var $author$project$PVMainSvg$Model = F4(
 	function (csvFile, csvData, notes, colorIndices) {
 		return {colorIndices: colorIndices, csvData: csvData, csvFile: csvFile, notes: notes};
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$PVMain$init = function (_v0) {
+var $author$project$PVMainSvg$init = function (_v0) {
 	return _Utils_Tuple2(
 		A4(
-			$author$project$PVMain$Model,
+			$author$project$PVMainSvg$Model,
 			$elm$core$Maybe$Nothing,
 			A2(
 				$lovasoa$elm_csv$Csv$Csv,
@@ -5251,7 +5251,7 @@ var $author$project$PVMain$init = function (_v0) {
 			_List_Nil),
 		$elm$core$Platform$Cmd$none);
 };
-var $author$project$PVMain$CSVParse = function (a) {
+var $author$project$PVMainSvg$CSVParse = function (a) {
 	return {$: 'CSVParse', a: a};
 };
 var $elm$json$Json$Decode$andThen = _Json_andThen;
@@ -5271,10 +5271,10 @@ var $author$project$Ports$fileContentRead = _Platform_incomingPort(
 				A2($elm$json$Json$Decode$field, 'contents', $elm$json$Json$Decode$string));
 		},
 		A2($elm$json$Json$Decode$field, 'filename', $elm$json$Json$Decode$string)));
-var $author$project$PVMain$subscriptions = function (model) {
-	return $author$project$Ports$fileContentRead($author$project$PVMain$CSVParse);
+var $author$project$PVMainSvg$subscriptions = function (model) {
+	return $author$project$Ports$fileContentRead($author$project$PVMainSvg$CSVParse);
 };
-var $author$project$PVMain$ColorIndexUpdate = function (a) {
+var $author$project$PVMainSvg$ColorIndexUpdate = function (a) {
 	return {$: 'ColorIndexUpdate', a: a};
 };
 var $elm$random$Random$Generator = function (a) {
@@ -5416,7 +5416,7 @@ var $elm$random$Random$uniform = F2(
 			$elm$random$Random$addOne(value),
 			A2($elm$core$List$map, $elm$random$Random$addOne, valueList));
 	});
-var $author$project$PVMain$colorIndices = function (n) {
+var $author$project$PVMainSvg$colorIndices = function (n) {
 	return A2(
 		$elm$random$Random$list,
 		n,
@@ -5668,7 +5668,7 @@ var $lovasoa$elm_csv$Csv$parseWith = F2(
 		return {headers: headers, records: records};
 	});
 var $lovasoa$elm_csv$Csv$parse = $lovasoa$elm_csv$Csv$parseWith(',');
-var $author$project$PVMain$Note = F3(
+var $author$project$PVMainSvg$Note = F3(
 	function (author, recipient, message) {
 		return {author: author, message: message, recipient: recipient};
 	});
@@ -5676,7 +5676,7 @@ var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
 	return y;
 };
-var $author$project$PVMain$extractFields = F2(
+var $author$project$PVMainSvg$extractFields = F2(
 	function (pairs, noteSoFar) {
 		extractFields:
 		while (true) {
@@ -5687,19 +5687,19 @@ var $author$project$PVMain$extractFields = F2(
 				switch (_v1) {
 					case 0:
 						var $temp$pairs = A2($elm$core$List$drop, 1, pairs),
-							$temp$noteSoFar = A3($author$project$PVMain$Note, aTuple.b, noteSoFar.recipient, noteSoFar.message);
+							$temp$noteSoFar = A3($author$project$PVMainSvg$Note, aTuple.b, noteSoFar.recipient, noteSoFar.message);
 						pairs = $temp$pairs;
 						noteSoFar = $temp$noteSoFar;
 						continue extractFields;
 					case 1:
 						var $temp$pairs = A2($elm$core$List$drop, 1, pairs),
-							$temp$noteSoFar = A3($author$project$PVMain$Note, noteSoFar.author, aTuple.b, noteSoFar.message);
+							$temp$noteSoFar = A3($author$project$PVMainSvg$Note, noteSoFar.author, aTuple.b, noteSoFar.message);
 						pairs = $temp$pairs;
 						noteSoFar = $temp$noteSoFar;
 						continue extractFields;
 					case 2:
 						var $temp$pairs = A2($elm$core$List$drop, 1, pairs),
-							$temp$noteSoFar = A3($author$project$PVMain$Note, noteSoFar.author, noteSoFar.recipient, aTuple.b);
+							$temp$noteSoFar = A3($author$project$PVMainSvg$Note, noteSoFar.author, noteSoFar.recipient, aTuple.b);
 						pairs = $temp$pairs;
 						noteSoFar = $temp$noteSoFar;
 						continue extractFields;
@@ -5719,22 +5719,22 @@ var $elm$core$Tuple$pair = F2(
 	function (a, b) {
 		return _Utils_Tuple2(a, b);
 	});
-var $author$project$PVMain$toNote = function (fields) {
+var $author$project$PVMainSvg$toNote = function (fields) {
 	var pairs = A2($elm$core$List$indexedMap, $elm$core$Tuple$pair, fields);
 	return A2(
-		$author$project$PVMain$extractFields,
+		$author$project$PVMainSvg$extractFields,
 		pairs,
-		A3($author$project$PVMain$Note, '', '', ''));
+		A3($author$project$PVMainSvg$Note, '', '', ''));
 };
-var $author$project$PVMain$parseCsvData = function (csvData) {
+var $author$project$PVMainSvg$parseCsvData = function (csvData) {
 	return A2(
 		$elm$core$List$map,
 		function (r) {
-			return $author$project$PVMain$toNote(r);
+			return $author$project$PVMainSvg$toNote(r);
 		},
 		csvData.records);
 };
-var $author$project$PVMain$update = F2(
+var $author$project$PVMainSvg$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 'CSVSelected':
@@ -5759,12 +5759,12 @@ var $author$project$PVMain$update = F2(
 					_Utils_update(
 						model,
 						{
-							notes: $author$project$PVMain$parseCsvData(model.csvData)
+							notes: $author$project$PVMainSvg$parseCsvData(model.csvData)
 						}),
 					A2(
 						$elm$random$Random$generate,
-						$author$project$PVMain$ColorIndexUpdate,
-						$author$project$PVMain$colorIndices(
+						$author$project$PVMainSvg$ColorIndexUpdate,
+						$author$project$PVMainSvg$colorIndices(
 							$elm$core$List$length(model.csvData.records))));
 			default:
 				var indices = msg.a;
@@ -5775,8 +5775,8 @@ var $author$project$PVMain$update = F2(
 					$elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$PVMain$CSVSelected = {$: 'CSVSelected'};
-var $author$project$PVMain$RenderNotes = {$: 'RenderNotes'};
+var $author$project$PVMainSvg$CSVSelected = {$: 'CSVSelected'};
+var $author$project$PVMainSvg$RenderNotes = {$: 'RenderNotes'};
 var $elm$html$Html$br = _VirtualDom_node('br');
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -5795,7 +5795,7 @@ var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$th = _VirtualDom_node('th');
 var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $author$project$PVMain$csvTable = function (data) {
+var $author$project$PVMainSvg$csvTable = function (data) {
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
@@ -5843,11 +5843,11 @@ var $author$project$PVMain$csvTable = function (data) {
 						data.records)))
 			]));
 };
-var $author$project$PVMain$csvView = F2(
+var $author$project$PVMainSvg$csvView = F2(
 	function (file, csvData) {
 		if (file.$ === 'Just') {
 			var i = file.a;
-			return $author$project$PVMain$csvTable(csvData);
+			return $author$project$PVMainSvg$csvTable(csvData);
 		} else {
 			return $elm$html$Html$text('NOTHING TO SHOW');
 		}
@@ -5873,7 +5873,7 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
-var $author$project$PVMain$getColor = function (index) {
+var $author$project$PVMainSvg$getColor = function (index) {
 	switch (index) {
 		case 1:
 			return '#ffff99';
@@ -5890,7 +5890,7 @@ var $author$project$PVMain$getColor = function (index) {
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $author$project$PVMain$renderPostIt = function (pair) {
+var $author$project$PVMainSvg$renderPostIt = function (pair) {
 	var note = pair.a;
 	var colorIndex = pair.b;
 	return A2(
@@ -5901,7 +5901,7 @@ var $author$project$PVMain$renderPostIt = function (pair) {
 				A2(
 				$elm$html$Html$Attributes$style,
 				'background-color',
-				$author$project$PVMain$getColor(colorIndex))
+				$author$project$PVMainSvg$getColor(colorIndex))
 			]),
 		_List_fromArray(
 			[
@@ -5928,7 +5928,7 @@ var $author$project$PVMain$renderPostIt = function (pair) {
 					]))
 			]));
 };
-var $author$project$PVMain$renderPostIts = F2(
+var $author$project$PVMainSvg$renderPostIts = F2(
 	function (notes, indices) {
 		var pairs = A3($elm$core$List$map2, $elm$core$Tuple$pair, notes, indices);
 		return A2(
@@ -5937,11 +5937,11 @@ var $author$project$PVMain$renderPostIts = F2(
 			A2(
 				$elm$core$List$map,
 				function (p) {
-					return $author$project$PVMain$renderPostIt(p);
+					return $author$project$PVMainSvg$renderPostIt(p);
 				},
 				pairs));
 	});
-var $author$project$PVMain$generateXY = F2(
+var $author$project$PVMainSvg$generateXY = F2(
 	function (xySoFar, pairs) {
 		generateXY:
 		while (true) {
@@ -5984,7 +5984,7 @@ var $elm$svg$Svg$Attributes$ry = _VirtualDom_attribute('ry');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
 var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
-var $author$project$PVMain$renderPostIt3 = F3(
+var $author$project$PVMainSvg$renderPostIt3 = F3(
 	function (note, colorIndex, xy) {
 		if (xy.$ === 'Just') {
 			var aPair = xy.a;
@@ -6001,7 +6001,7 @@ var $author$project$PVMain$renderPostIt3 = F3(
 						$elm$svg$Svg$Attributes$rx('5'),
 						$elm$svg$Svg$Attributes$ry('5'),
 						$elm$svg$Svg$Attributes$fill(
-						$author$project$PVMain$getColor(colorIndex)),
+						$author$project$PVMainSvg$getColor(colorIndex)),
 						$elm$svg$Svg$Attributes$class('pshadow')
 					]),
 				_List_Nil);
@@ -6017,13 +6017,13 @@ var $author$project$PVMain$renderPostIt3 = F3(
 						$elm$svg$Svg$Attributes$rx('5'),
 						$elm$svg$Svg$Attributes$ry('5'),
 						$elm$svg$Svg$Attributes$fill(
-						$author$project$PVMain$getColor(colorIndex)),
+						$author$project$PVMainSvg$getColor(colorIndex)),
 						$elm$svg$Svg$Attributes$class('pshadow')
 					]),
 				_List_Nil);
 		}
 	});
-var $author$project$PVMain$renderPostIts3 = F3(
+var $author$project$PVMainSvg$renderPostIts3 = F3(
 	function (renderedSoFar, pairs, xy) {
 		renderPostIts3:
 		while (true) {
@@ -6033,7 +6033,7 @@ var $author$project$PVMain$renderPostIts3 = F3(
 				var note = firstPair.a;
 				var colorIndex = firstPair.b;
 				var nextPostIt = A3(
-					$author$project$PVMain$renderPostIt3,
+					$author$project$PVMainSvg$renderPostIt3,
 					note,
 					colorIndex,
 					$elm$core$List$head(xy));
@@ -6049,17 +6049,17 @@ var $author$project$PVMain$renderPostIts3 = F3(
 			}
 		}
 	});
-var $author$project$PVMain$renderPostIts2 = F2(
+var $author$project$PVMainSvg$renderPostIts2 = F2(
 	function (notes, indices) {
 		var pairs = A3($elm$core$List$map2, $elm$core$Tuple$pair, notes, indices);
 		var xy = $elm$core$List$reverse(
-			A2($author$project$PVMain$generateXY, _List_Nil, pairs));
-		return A3($author$project$PVMain$renderPostIts3, _List_Nil, pairs, xy);
+			A2($author$project$PVMainSvg$generateXY, _List_Nil, pairs));
+		return A3($author$project$PVMainSvg$renderPostIts3, _List_Nil, pairs, xy);
 	});
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
-var $author$project$PVMain$view = function (model) {
+var $author$project$PVMainSvg$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
@@ -6089,23 +6089,23 @@ var $author$project$PVMain$view = function (model) {
 								A2(
 								$elm$html$Html$Events$on,
 								'change',
-								$elm$json$Json$Decode$succeed($author$project$PVMain$CSVSelected))
+								$elm$json$Json$Decode$succeed($author$project$PVMainSvg$CSVSelected))
 							]),
 						_List_Nil)
 					])),
-				A2($author$project$PVMain$csvView, model.csvFile, model.csvData),
+				A2($author$project$PVMainSvg$csvView, model.csvFile, model.csvData),
 				A2($elm$html$Html$br, _List_Nil, _List_Nil),
 				A2(
 				$elm$html$Html$button,
 				_List_fromArray(
 					[
-						$elm$html$Html$Events$onClick($author$project$PVMain$RenderNotes)
+						$elm$html$Html$Events$onClick($author$project$PVMainSvg$RenderNotes)
 					]),
 				_List_fromArray(
 					[
 						$elm$html$Html$text('Render Post-Its')
 					])),
-				A2($author$project$PVMain$renderPostIts, model.notes, model.colorIndices),
+				A2($author$project$PVMainSvg$renderPostIts, model.notes, model.colorIndices),
 				A2(
 				$elm$svg$Svg$svg,
 				_List_fromArray(
@@ -6115,10 +6115,10 @@ var $author$project$PVMain$view = function (model) {
 						$elm$svg$Svg$Attributes$viewBox('0 0 800 600'),
 						$elm$svg$Svg$Attributes$class('pshadow')
 					]),
-				A2($author$project$PVMain$renderPostIts2, model.notes, model.colorIndices))
+				A2($author$project$PVMainSvg$renderPostIts2, model.notes, model.colorIndices))
 			]));
 };
-var $author$project$PVMain$main = $elm$browser$Browser$element(
-	{init: $author$project$PVMain$init, subscriptions: $author$project$PVMain$subscriptions, update: $author$project$PVMain$update, view: $author$project$PVMain$view});
-_Platform_export({'PVMain':{'init':$author$project$PVMain$main(
+var $author$project$PVMainSvg$main = $elm$browser$Browser$element(
+	{init: $author$project$PVMainSvg$init, subscriptions: $author$project$PVMainSvg$subscriptions, update: $author$project$PVMainSvg$update, view: $author$project$PVMainSvg$view});
+_Platform_export({'PVMainSvg':{'init':$author$project$PVMainSvg$main(
 	$elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});}(this));
