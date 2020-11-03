@@ -5231,15 +5231,19 @@ var $lovasoa$elm_csv$Csv$Csv = F2(
 	function (headers, records) {
 		return {headers: headers, records: records};
 	});
-var $author$project$PVMainSvg$Model = F4(
-	function (csvFile, csvData, notes, colorIndices) {
-		return {colorIndices: colorIndices, csvData: csvData, csvFile: csvFile, notes: notes};
+var $author$project$PVMainSvg$Model = F6(
+	function (csvFile, csvData, notes, colorIndices, viewWidth, viewOrigin) {
+		return {colorIndices: colorIndices, csvData: csvData, csvFile: csvFile, notes: notes, viewOrigin: viewOrigin, viewWidth: viewWidth};
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $elm$core$Tuple$pair = F2(
+	function (a, b) {
+		return _Utils_Tuple2(a, b);
+	});
 var $author$project$PVMainSvg$init = function (_v0) {
 	return _Utils_Tuple2(
-		A4(
+		A6(
 			$author$project$PVMainSvg$Model,
 			$elm$core$Maybe$Nothing,
 			A2(
@@ -5248,7 +5252,9 @@ var $author$project$PVMainSvg$init = function (_v0) {
 				_List_fromArray(
 					[_List_Nil])),
 			_List_Nil,
-			_List_Nil),
+			_List_Nil,
+			2000,
+			A2($elm$core$Tuple$pair, 0, 0)),
 		$elm$core$Platform$Cmd$none);
 };
 var $author$project$PVMainSvg$CSVParse = function (a) {
@@ -5509,6 +5515,25 @@ var $elm$random$Random$generate = F2(
 			$elm$random$Random$Generate(
 				A2($elm$random$Random$map, tagger, generator)));
 	});
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $author$project$PVMainSvg$panLeft = F2(
+	function (viewOrigin, step) {
+		var prevY = viewOrigin.b;
+		var prevX = viewOrigin.a;
+		return A2(
+			$elm$core$Tuple$pair,
+			A2($elm$core$Basics$max, 0, prevX - step),
+			prevY);
+	});
+var $author$project$PVMainSvg$panRight = F2(
+	function (viewOrigin, step) {
+		var prevY = viewOrigin.b;
+		var prevX = viewOrigin.a;
+		return A2($elm$core$Tuple$pair, prevX + step, prevY);
+	});
 var $elm$core$List$drop = F2(
 	function (n, list) {
 		drop:
@@ -5672,10 +5697,6 @@ var $author$project$PVMainSvg$Note = F3(
 	function (author, recipient, message) {
 		return {author: author, message: message, recipient: recipient};
 	});
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
 var $author$project$PVMainSvg$extractFields = F2(
 	function (pairs, noteSoFar) {
 		extractFields:
@@ -5714,10 +5735,6 @@ var $author$project$PVMainSvg$extractFields = F2(
 				return noteSoFar;
 			}
 		}
-	});
-var $elm$core$Tuple$pair = F2(
-	function (a, b) {
-		return _Utils_Tuple2(a, b);
 	});
 var $author$project$PVMainSvg$toNote = function (fields) {
 	var pairs = A2($elm$core$List$indexedMap, $elm$core$Tuple$pair, fields);
@@ -5766,17 +5783,49 @@ var $author$project$PVMainSvg$update = F2(
 						$author$project$PVMainSvg$ColorIndexUpdate,
 						$author$project$PVMainSvg$colorIndices(
 							$elm$core$List$length(model.csvData.records))));
-			default:
+			case 'ColorIndexUpdate':
 				var indices = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{colorIndices: indices}),
 					$elm$core$Platform$Cmd$none);
+			case 'ZoomIn':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{viewWidth: model.viewWidth - 500}),
+					$elm$core$Platform$Cmd$none);
+			case 'ZoomOut':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{viewWidth: model.viewWidth + 500}),
+					$elm$core$Platform$Cmd$none);
+			case 'PanRight':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							viewOrigin: A2($author$project$PVMainSvg$panRight, model.viewOrigin, 100)
+						}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							viewOrigin: A2($author$project$PVMainSvg$panLeft, model.viewOrigin, 100)
+						}),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$PVMainSvg$CSVSelected = {$: 'CSVSelected'};
+var $author$project$PVMainSvg$PanLeft = {$: 'PanLeft'};
+var $author$project$PVMainSvg$PanRight = {$: 'PanRight'};
 var $author$project$PVMainSvg$RenderNotes = {$: 'RenderNotes'};
+var $author$project$PVMainSvg$ZoomIn = {$: 'ZoomIn'};
+var $author$project$PVMainSvg$ZoomOut = {$: 'ZoomOut'};
 var $elm$html$Html$br = _VirtualDom_node('br');
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -5941,6 +5990,13 @@ var $author$project$PVMainSvg$renderPostIts = F2(
 				},
 				pairs));
 	});
+var $author$project$PVMainSvg$getNextXY = F5(
+	function (prevPair, widthX, widthY, stepX, stepY) {
+		var yprev = prevPair.b;
+		var xprev = prevPair.a;
+		var xnext = xprev + stepX;
+		return (_Utils_cmp(xnext + stepX, widthX) > 0) ? A2($elm$core$Tuple$pair, 0, yprev + stepY) : A2($elm$core$Tuple$pair, xnext, yprev);
+	});
 var $author$project$PVMainSvg$generateXY = F2(
 	function (xySoFar, pairs) {
 		generateXY:
@@ -5962,9 +6018,12 @@ var $author$project$PVMainSvg$generateXY = F2(
 					var restXY = xySoFar.b;
 					var yprev = firstXY.b;
 					var xprev = firstXY.a;
+					var _v2 = A5($author$project$PVMainSvg$getNextXY, firstXY, 2000, 2000, 210, 210);
+					var xnext = _v2.a;
+					var ynext = _v2.b;
 					var $temp$xySoFar = A2(
 						$elm$core$List$cons,
-						A2($elm$core$Tuple$pair, xprev + 200, yprev + 200),
+						A2($elm$core$Tuple$pair, xnext, ynext),
 						xySoFar),
 						$temp$pairs = A2($elm$core$List$drop, 1, pairs);
 					xySoFar = $temp$xySoFar;
@@ -5976,11 +6035,24 @@ var $author$project$PVMainSvg$generateXY = F2(
 			}
 		}
 	});
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$svg$Svg$Attributes$fontFamily = _VirtualDom_attribute('font-family');
+var $elm$svg$Svg$Attributes$fontSize = _VirtualDom_attribute('font-size');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$foreignObject = $elm$svg$Svg$trustedNode('foreignObject');
 var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
 var $elm$svg$Svg$Attributes$rx = _VirtualDom_attribute('rx');
 var $elm$svg$Svg$Attributes$ry = _VirtualDom_attribute('ry');
+var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
 var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
@@ -5988,39 +6060,75 @@ var $author$project$PVMainSvg$renderPostIt3 = F3(
 	function (note, colorIndex, xy) {
 		if (xy.$ === 'Just') {
 			var aPair = xy.a;
-			return A2(
-				$elm$svg$Svg$rect,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$x(
-						$elm$core$String$fromInt(aPair.a)),
-						$elm$svg$Svg$Attributes$y(
-						$elm$core$String$fromInt(aPair.b)),
-						$elm$svg$Svg$Attributes$width('200'),
-						$elm$svg$Svg$Attributes$height('200'),
-						$elm$svg$Svg$Attributes$rx('5'),
-						$elm$svg$Svg$Attributes$ry('5'),
-						$elm$svg$Svg$Attributes$fill(
-						$author$project$PVMainSvg$getColor(colorIndex)),
-						$elm$svg$Svg$Attributes$class('pshadow')
-					]),
-				_List_Nil);
+			return _List_fromArray(
+				[
+					A2(
+					$elm$svg$Svg$rect,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$x(
+							$elm$core$String$fromInt(aPair.a)),
+							$elm$svg$Svg$Attributes$y(
+							$elm$core$String$fromInt(aPair.b)),
+							$elm$svg$Svg$Attributes$width('200'),
+							$elm$svg$Svg$Attributes$height('200'),
+							$elm$svg$Svg$Attributes$rx('5'),
+							$elm$svg$Svg$Attributes$ry('5'),
+							$elm$svg$Svg$Attributes$fill(
+							$author$project$PVMainSvg$getColor(colorIndex)),
+							$elm$svg$Svg$Attributes$class('pshadow')
+						]),
+					_List_Nil),
+					A2(
+					$elm$svg$Svg$foreignObject,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$x(
+							$elm$core$String$fromInt(aPair.a + 10)),
+							$elm$svg$Svg$Attributes$y(
+							$elm$core$String$fromInt(aPair.b + 10)),
+							$elm$svg$Svg$Attributes$width('190'),
+							$elm$svg$Svg$Attributes$height('190'),
+							$elm$svg$Svg$Attributes$fontSize('20px'),
+							$elm$svg$Svg$Attributes$fontFamily('Permanent Marker')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(note.message)
+						]))
+				]);
 		} else {
-			return A2(
-				$elm$svg$Svg$rect,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$x('0'),
-						$elm$svg$Svg$Attributes$y('0'),
-						$elm$svg$Svg$Attributes$width('200'),
-						$elm$svg$Svg$Attributes$height('200'),
-						$elm$svg$Svg$Attributes$rx('5'),
-						$elm$svg$Svg$Attributes$ry('5'),
-						$elm$svg$Svg$Attributes$fill(
-						$author$project$PVMainSvg$getColor(colorIndex)),
-						$elm$svg$Svg$Attributes$class('pshadow')
-					]),
-				_List_Nil);
+			return _List_fromArray(
+				[
+					A2(
+					$elm$svg$Svg$rect,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$x('0'),
+							$elm$svg$Svg$Attributes$y('0'),
+							$elm$svg$Svg$Attributes$width('200'),
+							$elm$svg$Svg$Attributes$height('200'),
+							$elm$svg$Svg$Attributes$rx('5'),
+							$elm$svg$Svg$Attributes$ry('5'),
+							$elm$svg$Svg$Attributes$fill(
+							$author$project$PVMainSvg$getColor(colorIndex)),
+							$elm$svg$Svg$Attributes$class('pshadow')
+						]),
+					_List_Nil),
+					A2(
+					$elm$svg$Svg$text_,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$x('0'),
+							$elm$svg$Svg$Attributes$y('0'),
+							$elm$svg$Svg$Attributes$fontSize('12'),
+							$elm$svg$Svg$Attributes$fontFamily('Permanent Marker')
+						]),
+					_List_fromArray(
+						[
+							$elm$svg$Svg$text('NONE')
+						]))
+				]);
 		}
 	});
 var $author$project$PVMainSvg$renderPostIts3 = F3(
@@ -6037,7 +6145,7 @@ var $author$project$PVMainSvg$renderPostIts3 = F3(
 					note,
 					colorIndex,
 					$elm$core$List$head(xy));
-				var $temp$renderedSoFar = A2($elm$core$List$cons, nextPostIt, renderedSoFar),
+				var $temp$renderedSoFar = A2($elm$core$List$append, nextPostIt, renderedSoFar),
 					$temp$pairs = A2($elm$core$List$drop, 1, pairs),
 					$temp$xy = A2($elm$core$List$drop, 1, xy);
 				renderedSoFar = $temp$renderedSoFar;
@@ -6106,16 +6214,70 @@ var $author$project$PVMainSvg$view = function (model) {
 						$elm$html$Html$text('Render Post-Its')
 					])),
 				A2($author$project$PVMainSvg$renderPostIts, model.notes, model.colorIndices),
+				A2($elm$html$Html$br, _List_Nil, _List_Nil),
 				A2(
-				$elm$svg$Svg$svg,
+				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$svg$Svg$Attributes$width('800'),
-						$elm$svg$Svg$Attributes$height('600'),
-						$elm$svg$Svg$Attributes$viewBox('0 0 800 600'),
-						$elm$svg$Svg$Attributes$class('pshadow')
+						A2($elm$html$Html$Attributes$style, 'border', '3px solid green'),
+						A2($elm$html$Html$Attributes$style, 'width', '1200px'),
+						A2($elm$html$Html$Attributes$style, 'height', '800px'),
+						A2($elm$html$Html$Attributes$style, 'overflow', 'scroll')
 					]),
-				A2($author$project$PVMainSvg$renderPostIts2, model.notes, model.colorIndices))
+				_List_fromArray(
+					[
+						A2(
+						$elm$svg$Svg$svg,
+						_List_fromArray(
+							[
+								$elm$svg$Svg$Attributes$width('100%'),
+								$elm$svg$Svg$Attributes$height('100%'),
+								$elm$svg$Svg$Attributes$viewBox(
+								$elm$core$String$fromInt(model.viewOrigin.a) + (' ' + ($elm$core$String$fromInt(model.viewOrigin.b) + (' ' + ($elm$core$String$fromInt(model.viewWidth) + (' ' + $elm$core$String$fromInt(model.viewWidth))))))),
+								$elm$svg$Svg$Attributes$class('pshadow')
+							]),
+						A2($author$project$PVMainSvg$renderPostIts2, model.notes, model.colorIndices))
+					])),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick($author$project$PVMainSvg$ZoomIn)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Zoom In')
+					])),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick($author$project$PVMainSvg$ZoomOut)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Zoom Out')
+					])),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick($author$project$PVMainSvg$PanLeft)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Pan Left')
+					])),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick($author$project$PVMainSvg$PanRight)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Pan Right')
+					]))
 			]));
 };
 var $author$project$PVMainSvg$main = $elm$browser$Browser$element(

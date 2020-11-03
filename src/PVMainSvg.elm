@@ -27,6 +27,10 @@ type Msg
     | CSVParse CSVPortData
     | RenderNotes
     | ColorIndexUpdate (List Int)
+    | ZoomIn
+    | ZoomOut
+    | PanLeft
+    | PanRight
 
 
 type alias CSVFile =
@@ -47,6 +51,8 @@ type alias Model =
     , csvData : Csv
     , notes : List Note
     , colorIndices : List Int
+    , viewWidth : Int
+    , viewOrigin : ( Int, Int )
     }
 
 
@@ -58,7 +64,7 @@ type alias Role =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Model Nothing (Csv [] [ [] ]) [] [], Cmd.none )
+    ( Model Nothing (Csv [] [ [] ]) [] [] 2000 (Tuple.pair 0 0), Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -89,9 +95,43 @@ update msg model =
         ColorIndexUpdate indices ->
             ( { model | colorIndices = indices }, Cmd.none )
 
+        ZoomIn ->
+            ( { model | viewWidth = model.viewWidth - 500 }, Cmd.none )
+
+        ZoomOut ->
+            ( { model | viewWidth = model.viewWidth + 500 }, Cmd.none )
+
+        PanRight ->
+            ( { model | viewOrigin = panRight model.viewOrigin 100 }, Cmd.none )
+
+        PanLeft ->
+            ( { model | viewOrigin = panLeft model.viewOrigin 100 }, Cmd.none )
+
 
 
 --colorIndices : Int -> Random.Generator (List Int)
+
+
+panRight viewOrigin step =
+    let
+        prevX =
+            Tuple.first viewOrigin
+
+        prevY =
+            Tuple.second viewOrigin
+    in
+    Tuple.pair (prevX + step) prevY
+
+
+panLeft viewOrigin step =
+    let
+        prevX =
+            Tuple.first viewOrigin
+
+        prevY =
+            Tuple.second viewOrigin
+    in
+    Tuple.pair (Basics.max 0 (prevX - step)) prevY
 
 
 colorIndices n =
@@ -153,13 +193,27 @@ view model =
         , br [] []
         , button [ onClick RenderNotes ] [ Html.text "Render Post-Its" ]
         , renderPostIts model.notes model.colorIndices
-        , svg
-            [ Svg.Attributes.width "800"
-            , Svg.Attributes.height "600"
-            , viewBox "0 0 800 600"
-            , Svg.Attributes.class "pshadow"
+        , br [] []
+        , div
+            [ Html.Attributes.style "border" "3px solid green"
+            , Html.Attributes.style "width" "1200px"
+            , Html.Attributes.style "height" "800px"
+            , Html.Attributes.style "overflow" "scroll"
             ]
-            (renderPostIts2 model.notes model.colorIndices)
+            [ svg
+                [ Svg.Attributes.width "100%"
+                , Svg.Attributes.height "100%"
+                , viewBox (String.fromInt (Tuple.first model.viewOrigin) ++ " " ++ String.fromInt (Tuple.second model.viewOrigin) ++ " " ++ String.fromInt model.viewWidth ++ " " ++ String.fromInt model.viewWidth)
+                , Svg.Attributes.class "pshadow"
+
+                --  , Svg.Attributes.overflow "auto"
+                ]
+                (renderPostIts2 model.notes model.colorIndices)
+            ]
+        , button [ onClick ZoomIn ] [ Html.text "Zoom In" ]
+        , button [ onClick ZoomOut ] [ Html.text "Zoom Out" ]
+        , button [ onClick PanLeft ] [ Html.text "Pan Left" ]
+        , button [ onClick PanRight ] [ Html.text "Pan Right" ]
 
         -- [ rect
         --     [ x "10"
@@ -211,7 +265,7 @@ renderPostIts3 renderedSoFar pairs xy =
                 nextPostIt =
                     renderPostIt3 note colorIndex (List.head xy)
             in
-            renderPostIts3 (nextPostIt :: renderedSoFar) (List.drop 1 pairs) (List.drop 1 xy)
+            renderPostIts3 (List.append nextPostIt renderedSoFar) (List.drop 1 pairs) (List.drop 1 xy)
 
         [] ->
             renderedSoFar
@@ -220,7 +274,7 @@ renderPostIts3 renderedSoFar pairs xy =
 renderPostIt3 note colorIndex xy =
     case xy of
         Just aPair ->
-            rect
+            [ rect
                 [ x (String.fromInt (Tuple.first aPair))
                 , y (String.fromInt (Tuple.second aPair))
                 , Svg.Attributes.width "200"
@@ -231,9 +285,19 @@ renderPostIt3 note colorIndex xy =
                 , Svg.Attributes.class "pshadow"
                 ]
                 []
+            , Svg.foreignObject
+                [ x (String.fromInt (Tuple.first aPair + 10))
+                , y (String.fromInt (Tuple.second aPair + 10))
+                , Svg.Attributes.width "190"
+                , Svg.Attributes.height "190"
+                , Svg.Attributes.fontSize "20px"
+                , Svg.Attributes.fontFamily "Permanent Marker"
+                ]
+                [ Html.text note.message ]
+            ]
 
         Nothing ->
-            rect
+            [ rect
                 [ x "0"
                 , y "0"
                 , Svg.Attributes.width "200"
@@ -244,6 +308,14 @@ renderPostIt3 note colorIndex xy =
                 , Svg.Attributes.class "pshadow"
                 ]
                 []
+            , Svg.text_
+                [ x "0"
+                , y "0"
+                , Svg.Attributes.fontSize "12"
+                , Svg.Attributes.fontFamily "Permanent Marker"
+                ]
+                [ Svg.text "NONE" ]
+            ]
 
 
 generateXY xySoFar pairs =
@@ -260,11 +332,32 @@ generateXY xySoFar pairs =
 
                         yprev =
                             Tuple.second firstXY
+
+                        ( xnext, ynext ) =
+                            getNextXY firstXY 2000 2000 210 210
                     in
-                    generateXY (Tuple.pair (xprev + 200) (yprev + 200) :: xySoFar) (List.drop 1 pairs)
+                    generateXY (Tuple.pair xnext ynext :: xySoFar) (List.drop 1 pairs)
 
         [] ->
             xySoFar
+
+
+getNextXY prevPair widthX widthY stepX stepY =
+    let
+        xprev =
+            Tuple.first prevPair
+
+        yprev =
+            Tuple.second prevPair
+
+        xnext =
+            xprev + stepX
+    in
+    if (xnext + stepX) > widthX then
+        Tuple.pair 0 (yprev + stepY)
+
+    else
+        Tuple.pair xnext yprev
 
 
 renderPostIt2 pair =
