@@ -5519,6 +5519,15 @@ var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
 	return y;
 };
+var $author$project$PVMainSvg$panDown = F2(
+	function (viewOrigin, step) {
+		var prevY = viewOrigin.b;
+		var prevX = viewOrigin.a;
+		return A2(
+			$elm$core$Tuple$pair,
+			prevX,
+			A2($elm$core$Basics$max, 0, prevY - step));
+	});
 var $author$project$PVMainSvg$panLeft = F2(
 	function (viewOrigin, step) {
 		var prevY = viewOrigin.b;
@@ -5533,6 +5542,12 @@ var $author$project$PVMainSvg$panRight = F2(
 		var prevY = viewOrigin.b;
 		var prevX = viewOrigin.a;
 		return A2($elm$core$Tuple$pair, prevX + step, prevY);
+	});
+var $author$project$PVMainSvg$panUp = F2(
+	function (viewOrigin, step) {
+		var prevY = viewOrigin.b;
+		var prevX = viewOrigin.a;
+		return A2($elm$core$Tuple$pair, prevX, prevY + step);
 	});
 var $elm$core$List$drop = F2(
 	function (n, list) {
@@ -5810,7 +5825,7 @@ var $author$project$PVMainSvg$update = F2(
 							viewOrigin: A2($author$project$PVMainSvg$panRight, model.viewOrigin, 100)
 						}),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'PanLeft':
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -5818,11 +5833,29 @@ var $author$project$PVMainSvg$update = F2(
 							viewOrigin: A2($author$project$PVMainSvg$panLeft, model.viewOrigin, 100)
 						}),
 					$elm$core$Platform$Cmd$none);
+			case 'PanUp':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							viewOrigin: A2($author$project$PVMainSvg$panUp, model.viewOrigin, 100)
+						}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							viewOrigin: A2($author$project$PVMainSvg$panDown, model.viewOrigin, 100)
+						}),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$PVMainSvg$CSVSelected = {$: 'CSVSelected'};
+var $author$project$PVMainSvg$PanDown = {$: 'PanDown'};
 var $author$project$PVMainSvg$PanLeft = {$: 'PanLeft'};
 var $author$project$PVMainSvg$PanRight = {$: 'PanRight'};
+var $author$project$PVMainSvg$PanUp = {$: 'PanUp'};
 var $author$project$PVMainSvg$RenderNotes = {$: 'RenderNotes'};
 var $author$project$PVMainSvg$ZoomIn = {$: 'ZoomIn'};
 var $author$project$PVMainSvg$ZoomOut = {$: 'ZoomOut'};
@@ -5959,20 +5992,6 @@ var $author$project$PVMainSvg$renderPostIt = function (pair) {
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text('TO: ' + note.recipient)
-					])),
-				A2(
-				$elm$html$Html$h2,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text('FROM: ' + note.author)
-					])),
-				A2(
-				$elm$html$Html$h2,
-				_List_Nil,
-				_List_fromArray(
-					[
 						$elm$html$Html$text(note.message)
 					]))
 			]));
@@ -5997,10 +6016,16 @@ var $author$project$PVMainSvg$getNextXY = F5(
 		var xnext = xprev + stepX;
 		return (_Utils_cmp(xnext + stepX, widthX) > 0) ? A2($elm$core$Tuple$pair, 0, yprev + stepY) : A2($elm$core$Tuple$pair, xnext, yprev);
 	});
+var $author$project$PVMainSvg$getPostItSize = _Utils_Tuple2(500, 500);
+var $author$project$PVMainSvg$getPostItStep = 20;
 var $author$project$PVMainSvg$generateXY = F2(
 	function (xySoFar, pairs) {
 		generateXY:
 		while (true) {
+			var step = $author$project$PVMainSvg$getPostItStep;
+			var _v0 = $author$project$PVMainSvg$getPostItSize;
+			var width = _v0.a;
+			var height = _v0.b;
 			if (pairs.b) {
 				var first = pairs.a;
 				var rest = pairs.b;
@@ -6018,9 +6043,9 @@ var $author$project$PVMainSvg$generateXY = F2(
 					var restXY = xySoFar.b;
 					var yprev = firstXY.b;
 					var xprev = firstXY.a;
-					var _v2 = A5($author$project$PVMainSvg$getNextXY, firstXY, 2000, 2000, 210, 210);
-					var xnext = _v2.a;
-					var ynext = _v2.b;
+					var _v3 = A5($author$project$PVMainSvg$getNextXY, firstXY, 3600, 2000, width + step, height + step);
+					var xnext = _v3.a;
+					var ynext = _v3.b;
 					var $temp$xySoFar = A2(
 						$elm$core$List$cons,
 						A2($elm$core$Tuple$pair, xnext, ynext),
@@ -6058,6 +6083,10 @@ var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
 var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
 var $author$project$PVMainSvg$renderPostIt3 = F3(
 	function (note, colorIndex, xy) {
+		var step = $author$project$PVMainSvg$getPostItStep;
+		var _v0 = $author$project$PVMainSvg$getPostItSize;
+		var width = _v0.a;
+		var height = _v0.b;
 		if (xy.$ === 'Just') {
 			var aPair = xy.a;
 			return _List_fromArray(
@@ -6070,10 +6099,10 @@ var $author$project$PVMainSvg$renderPostIt3 = F3(
 							$elm$core$String$fromInt(aPair.a)),
 							$elm$svg$Svg$Attributes$y(
 							$elm$core$String$fromInt(aPair.b)),
-							$elm$svg$Svg$Attributes$width('200'),
-							$elm$svg$Svg$Attributes$height('200'),
-							$elm$svg$Svg$Attributes$rx('5'),
-							$elm$svg$Svg$Attributes$ry('5'),
+							$elm$svg$Svg$Attributes$width(
+							$elm$core$String$fromInt(width)),
+							$elm$svg$Svg$Attributes$height(
+							$elm$core$String$fromInt(height)),
 							$elm$svg$Svg$Attributes$fill(
 							$author$project$PVMainSvg$getColor(colorIndex)),
 							$elm$svg$Svg$Attributes$class('pshadow')
@@ -6084,17 +6113,25 @@ var $author$project$PVMainSvg$renderPostIt3 = F3(
 					_List_fromArray(
 						[
 							$elm$svg$Svg$Attributes$x(
-							$elm$core$String$fromInt(aPair.a + 10)),
+							$elm$core$String$fromInt(aPair.a + step)),
 							$elm$svg$Svg$Attributes$y(
-							$elm$core$String$fromInt(aPair.b + 10)),
-							$elm$svg$Svg$Attributes$width('190'),
-							$elm$svg$Svg$Attributes$height('190'),
+							$elm$core$String$fromInt(aPair.b + step)),
+							$elm$svg$Svg$Attributes$width(
+							$elm$core$String$fromInt(width - (2 * step))),
+							$elm$svg$Svg$Attributes$height(
+							$elm$core$String$fromInt(height - (2 * step))),
 							$elm$svg$Svg$Attributes$fontSize('20px'),
 							$elm$svg$Svg$Attributes$fontFamily('Permanent Marker')
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text(note.message)
+							A2(
+							$elm$html$Html$h2,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text(note.message)
+								]))
 						]))
 				]);
 		} else {
@@ -6215,17 +6252,29 @@ var $author$project$PVMainSvg$view = function (model) {
 					])),
 				A2($author$project$PVMainSvg$renderPostIts, model.notes, model.colorIndices),
 				A2($elm$html$Html$br, _List_Nil, _List_Nil),
+				A2($elm$html$Html$br, _List_Nil, _List_Nil),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						A2($elm$html$Html$Attributes$style, 'border', '3px solid green'),
-						A2($elm$html$Html$Attributes$style, 'width', '1200px'),
-						A2($elm$html$Html$Attributes$style, 'height', '800px'),
-						A2($elm$html$Html$Attributes$style, 'overflow', 'scroll')
+						A2($elm$html$Html$Attributes$style, 'width', '2000px'),
+						A2($elm$html$Html$Attributes$style, 'height', '1200px'),
+						A2($elm$html$Html$Attributes$style, 'overflow', 'scroll'),
+						A2($elm$html$Html$Attributes$style, 'background-color', 'black')
 					]),
 				_List_fromArray(
 					[
+						A2(
+						$elm$html$Html$h1,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
+								A2($elm$html$Html$Attributes$style, 'fontFamily', 'sans-serif')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('What is someone or something at NSCD that you are most thankful for?')
+							])),
 						A2(
 						$elm$svg$Svg$svg,
 						_List_fromArray(
@@ -6277,6 +6326,26 @@ var $author$project$PVMainSvg$view = function (model) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text('Pan Right')
+					])),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick($author$project$PVMainSvg$PanUp)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Pan Up')
+					])),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick($author$project$PVMainSvg$PanDown)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Pan Down')
 					]))
 			]));
 };

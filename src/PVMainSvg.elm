@@ -31,6 +31,8 @@ type Msg
     | ZoomOut
     | PanLeft
     | PanRight
+    | PanUp
+    | PanDown
 
 
 type alias CSVFile =
@@ -107,6 +109,12 @@ update msg model =
         PanLeft ->
             ( { model | viewOrigin = panLeft model.viewOrigin 100 }, Cmd.none )
 
+        PanUp ->
+            ( { model | viewOrigin = panUp model.viewOrigin 100 }, Cmd.none )
+
+        PanDown ->
+            ( { model | viewOrigin = panDown model.viewOrigin 100 }, Cmd.none )
+
 
 
 --colorIndices : Int -> Random.Generator (List Int)
@@ -132,6 +140,28 @@ panLeft viewOrigin step =
             Tuple.second viewOrigin
     in
     Tuple.pair (Basics.max 0 (prevX - step)) prevY
+
+
+panUp viewOrigin step =
+    let
+        prevX =
+            Tuple.first viewOrigin
+
+        prevY =
+            Tuple.second viewOrigin
+    in
+    Tuple.pair prevX (prevY + step)
+
+
+panDown viewOrigin step =
+    let
+        prevX =
+            Tuple.first viewOrigin
+
+        prevY =
+            Tuple.second viewOrigin
+    in
+    Tuple.pair prevX (Basics.max 0 (prevY - step))
 
 
 colorIndices n =
@@ -194,13 +224,22 @@ view model =
         , button [ onClick RenderNotes ] [ Html.text "Render Post-Its" ]
         , renderPostIts model.notes model.colorIndices
         , br [] []
+        , br [] []
         , div
-            [ Html.Attributes.style "border" "3px solid green"
-            , Html.Attributes.style "width" "1200px"
-            , Html.Attributes.style "height" "800px"
+            [ --Html.Attributes.style "border" "3px solid green"
+              Html.Attributes.style "width" "2000px"
+            , Html.Attributes.style "height" "1200px"
             , Html.Attributes.style "overflow" "scroll"
+            , Html.Attributes.style "background-color" "black"
+
+            --, Html.Attributes.style "margin" "0 auto"
             ]
-            [ svg
+            [ h1
+                [ Html.Attributes.style "text-align" "center"
+                , Html.Attributes.style "fontFamily" "sans-serif"
+                ]
+                [ Html.text "What is someone or something at NSCD that you are most thankful for?" ]
+            , svg
                 [ Svg.Attributes.width "100%"
                 , Svg.Attributes.height "100%"
                 , viewBox (String.fromInt (Tuple.first model.viewOrigin) ++ " " ++ String.fromInt (Tuple.second model.viewOrigin) ++ " " ++ String.fromInt model.viewWidth ++ " " ++ String.fromInt model.viewWidth)
@@ -214,6 +253,8 @@ view model =
         , button [ onClick ZoomOut ] [ Html.text "Zoom Out" ]
         , button [ onClick PanLeft ] [ Html.text "Pan Left" ]
         , button [ onClick PanRight ] [ Html.text "Pan Right" ]
+        , button [ onClick PanUp ] [ Html.text "Pan Up" ]
+        , button [ onClick PanDown ] [ Html.text "Pan Down" ]
 
         -- [ rect
         --     [ x "10"
@@ -271,29 +312,45 @@ renderPostIts3 renderedSoFar pairs xy =
             renderedSoFar
 
 
+getPostItSize =
+    ( 500, 500 )
+
+
+getPostItStep =
+    20
+
+
 renderPostIt3 note colorIndex xy =
+    let
+        ( width, height ) =
+            getPostItSize
+
+        step =
+            getPostItStep
+    in
     case xy of
         Just aPair ->
             [ rect
                 [ x (String.fromInt (Tuple.first aPair))
                 , y (String.fromInt (Tuple.second aPair))
-                , Svg.Attributes.width "200"
-                , Svg.Attributes.height "200"
-                , rx "5"
-                , ry "5"
+                , Svg.Attributes.width (String.fromInt width)
+                , Svg.Attributes.height (String.fromInt height)
+
+                --, rx "5"
+                --, ry "5"
                 , fill (getColor colorIndex)
                 , Svg.Attributes.class "pshadow"
                 ]
                 []
             , Svg.foreignObject
-                [ x (String.fromInt (Tuple.first aPair + 10))
-                , y (String.fromInt (Tuple.second aPair + 10))
-                , Svg.Attributes.width "190"
-                , Svg.Attributes.height "190"
+                [ x (String.fromInt (Tuple.first aPair + step))
+                , y (String.fromInt (Tuple.second aPair + step))
+                , Svg.Attributes.width (String.fromInt (width - 2 * step))
+                , Svg.Attributes.height (String.fromInt (height - 2 * step))
                 , Svg.Attributes.fontSize "20px"
                 , Svg.Attributes.fontFamily "Permanent Marker"
                 ]
-                [ Html.text note.message ]
+                [ h2 [] [ Html.text note.message ] ]
             ]
 
         Nothing ->
@@ -319,6 +376,13 @@ renderPostIt3 note colorIndex xy =
 
 
 generateXY xySoFar pairs =
+    let
+        ( width, height ) =
+            getPostItSize
+
+        step =
+            getPostItStep
+    in
     case pairs of
         first :: rest ->
             case xySoFar of
@@ -334,7 +398,7 @@ generateXY xySoFar pairs =
                             Tuple.second firstXY
 
                         ( xnext, ynext ) =
-                            getNextXY firstXY 2000 2000 210 210
+                            getNextXY firstXY 3600 2000 (width + step) (height + step)
                     in
                     generateXY (Tuple.pair xnext ynext :: xySoFar) (List.drop 1 pairs)
 
@@ -398,9 +462,9 @@ renderPostIt pair =
             Tuple.second pair
     in
     div [ Html.Attributes.class "postIt", Html.Attributes.style "background-color" (getColor colorIndex) ]
-        [ h2 [] [ Html.text ("TO: " ++ note.recipient) ]
-        , h2 [] [ Html.text ("FROM: " ++ note.author) ]
-        , h2 [] [ Html.text note.message ]
+        [ --h2 [] [ Html.text ("TO: " ++ note.recipient) ]
+          --, h2 [] [ Html.text ("FROM: " ++ note.author) ]
+          h2 [] [ Html.text note.message ]
         ]
 
 
